@@ -79,9 +79,6 @@ func get_ground_posi(screen_pos):
     else:
         return null
 
-remote func request_atk(mob_name):
-    print(mob_name)
-
 func _input(event):
     if b_master==false:
         return
@@ -117,7 +114,7 @@ func _input(event):
                 if b_drag==false:
                     var collider = get_point_mob(event.position)
                     if collider!=null:
-                        rpc_id(1, "request_atk", collider.name)
+                        rpc_id(1, "request_battle", collider.name)
                     else:
                         var posi_ground = get_ground_posi(event.position)
                         if posi_ground!= null:
@@ -134,10 +131,10 @@ func _input(event):
                 if cam.translation.z>5:
                     cam.translation.z=5
 
-func on_create(_world):
-    .on_create(_world)
-
 func _ready():
     state_space=get_world().direct_space_state
     cam_platform=get_node(cam_platform_path)
     cam=get_node(cam_path)
+    ai_scheme="idle"
+    set_idle()
+    set_anima_idle()

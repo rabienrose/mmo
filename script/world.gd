@@ -87,15 +87,17 @@ func deseri_cur_path(path_seri):
         cur_path.append(Vector3(item[0],item[1],item[2]))
     return cur_path
 
-remote func sync_mob_and_player(mob_player_list):
-    var mob_list=mob_player_list["mobs"]
-    for mob_info in mob_list:
-        var mob=mob_res.instance()
-        mob.name=mob_info["name"]
-        mob.on_create(self)
-        get_node(mobs_path).add_child(mob)
-        mob.on_move_to(deseri_cur_path(mob_info["cur_path"]),mob_info["path_index"])
-        mob.set_ground_position(Global.list_2_v3(mob_info["posi"]))
+func get_mob_by_name(query_name):
+    for obj in mobs.get_children():
+        if obj.name==query_name:
+            return obj
+    return null
+
+func get_player_by_name(query_name):
+    for obj in players.get_children():
+        if obj.name==query_name:
+            return obj
+    return null
 
 remotesync func spawn_mobs(mob_info):
     pass
@@ -123,6 +125,16 @@ remotesync func spawn_player(player_info):
     else:
         player.set_master(false)
     player.set_ground_position(player_info["cur_posi"])
+
+remote func sync_mob_and_player(mob_player_list):
+    var mob_list=mob_player_list["mobs"]
+    for mob_info in mob_list:
+        var mob=mob_res.instance()
+        mob.name=mob_info["name"]
+        mob.on_create(self)
+        get_node(mobs_path).add_child(mob)
+        mob.start_move(deseri_cur_path(mob_info["cur_path"]),mob_info["path_index"])
+        mob.set_ground_position(Global.list_2_v3(mob_info["posi"]))
 
 remote func on_user_enter_done():
     get_node(login_ui_path).visible=false

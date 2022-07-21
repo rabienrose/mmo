@@ -255,7 +255,13 @@ environment = SubResource( 3 )
 
 [node name="Mobs" type="Spatial" parent="."]
 
+[node name="Mob" parent="Mobs" instance=ExtResource( 7 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.14573, 0.874123, 10.3374 )
+
 [node name="Players" type="Spatial" parent="."]
+
+[node name="Player" parent="Players" instance=ExtResource( 8 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.383, 0.74373, 9.1131 )
 
 [node name="Login" parent="." instance=ExtResource( 10 )]
 network_path = NodePath("../Network")

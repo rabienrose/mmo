@@ -8,6 +8,7 @@
 [ext_resource path="res://ui/texture/l_bg_green.tres" type="Texture" id=6]
 [ext_resource path="res://binary/images/bg/splash/2a5a6fd59691cb4b648fcac877e1469e.jpeg" type="Texture" id=7]
 [ext_resource path="res://ui/comfirm_box.tscn" type="PackedScene" id=8]
+[ext_resource path="res://ui/font/normal_font.tres" type="DynamicFont" id=9]
 
 [sub_resource type="DynamicFont" id=1]
 size = 30
@@ -21,10 +22,6 @@ font_data = ExtResource( 4 )
 bg_color = Color( 0.6, 0.6, 0.6, 0 )
 border_width_bottom = 4
 border_color = Color( 1, 1, 1, 1 )
-
-[sub_resource type="DynamicFont" id=4]
-size = 30
-font_data = ExtResource( 4 )
 
 [node name="Login" type="TextureRect"]
 anchor_right = 1.0
@@ -163,7 +160,7 @@ expand = true
 [node name="Label" type="Label" parent="CenterContainer/InputRoot/VBoxContainer/HBoxContainer3/LoginBtn"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = ExtResource( 9 )
 text = "LOGIN"
 align = 1
 valign = 1
@@ -183,7 +180,7 @@ expand = true
 [node name="Label" type="Label" parent="CenterContainer/InputRoot/VBoxContainer/HBoxContainer3/RegistBtn"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = ExtResource( 9 )
 text = "REGIST"
 align = 1
 valign = 1
@@ -203,7 +200,7 @@ expand = true
 [node name="Label" type="Label" parent="CenterContainer/InputRoot/VBoxContainer/HBoxContainer3/ClearBtn"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = ExtResource( 9 )
 text = "CLEAR"
 align = 1
 valign = 1

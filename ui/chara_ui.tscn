@@ -1,0 +1,120 @@
+[gd_scene load_steps=13 format=2]
+
+[ext_resource path="res://binary/images/ui/barHorizontal_green.png" type="Texture" id=1]
+[ext_resource path="res://binary/images/ui/barHorizontal_blue.png" type="Texture" id=2]
+[ext_resource path="res://ui/chara_ui.gd" type="Script" id=3]
+[ext_resource path="res://ui/font/nameboard_font.tres" type="DynamicFont" id=4]
+[ext_resource path="res://binary/images/ui/barHorizontal_yellow.png" type="Texture" id=5]
+[ext_resource path="res://binary/images/ui/barHorizontal_red.png" type="Texture" id=6]
+[ext_resource path="res://binary/images/fx/smoke_03.png" type="Texture" id=7]
+
+[sub_resource type="ViewportTexture" id=8]
+viewport_path = NodePath("Top/Viewport")
+
+[sub_resource type="SpatialMaterial" id=3]
+flags_transparent = true
+flags_unshaded = true
+flags_no_depth_test = true
+vertex_color_use_as_albedo = true
+params_blend_mode = 1
+params_billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+albedo_color = Color( 0.415686, 0.376471, 0.317647, 1 )
+albedo_texture = ExtResource( 7 )
+
+[sub_resource type="QuadMesh" id=4]
+
+[sub_resource type="Curve" id=5]
+_data = [ Vector2( 0, 0 ), 0.0, 1.65083, 0, 0, Vector2( 1, 0.787271 ), 0.0329221, 0.0, 0, 0 ]
+
+[sub_resource type="Gradient" id=6]
+colors = PoolColorArray( 0.717647, 0.635294, 0.584314, 1, 0.341176, 0.313726, 0.282353, 0 )
+
+[node name="UI" type="Spatial"]
+script = ExtResource( 3 )
+bar_red = ExtResource( 6 )
+bar_green = ExtResource( 1 )
+bar_yellow = ExtResource( 5 )
+hp_bar_path = NodePath("Top/Viewport/Control/HpBar")
+sp_bar_path = NodePath("Top/Viewport/Control/SpBar")
+
+[node name="Top" type="Sprite3D" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05784, 0 )
+cast_shadow = 0
+billboard = 1
+texture = SubResource( 8 )
+
+[node name="Viewport" type="Viewport" parent="Top"]
+size = Vector2( 100, 57 )
+transparent_bg = true
+handle_input_locally = false
+usage = 0
+render_target_v_flip = true
+
+[node name="Control" type="VBoxContainer" parent="Top/Viewport"]
+margin_right = 100.0
+margin_bottom = 57.0
+custom_constants/separation = 0
+
+[node name="Label" type="Label" parent="Top/Viewport/Control"]
+margin_right = 100.0
+margin_bottom = 27.0
+custom_fonts/font = ExtResource( 4 )
+text = "Rabienrose"
+align = 1
+valign = 1
+
+[node name="HpBar" type="TextureProgress" parent="Top/Viewport/Control"]
+margin_top = 27.0
+margin_right = 100.0
+margin_bottom = 37.0
+rect_min_size = Vector2( 100, 10 )
+size_flags_horizontal = 4
+max_value = 10.0
+value = 10.0
+texture_progress = ExtResource( 1 )
+nine_patch_stretch = true
+stretch_margin_left = 7
+stretch_margin_top = 2
+stretch_margin_right = 7
+stretch_margin_bottom = 2
+
+[node name="SpBar" type="TextureProgress" parent="Top/Viewport/Control"]
+margin_top = 37.0
+margin_right = 100.0
+margin_bottom = 47.0
+rect_min_size = Vector2( 100, 10 )
+size_flags_horizontal = 4
+max_value = 10.0
+value = 10.0
+texture_progress = ExtResource( 2 )
+nine_patch_stretch = true
+stretch_margin_left = 7
+stretch_margin_top = 2
+stretch_margin_right = 7
+stretch_margin_bottom = 2
+
+[node name="HitFx" type="CPUParticles" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.539067, 0 )
+material_override = SubResource( 3 )
+cast_shadow = 0
+emitting = false
+lifetime = 0.5
+one_shot = true
+explosiveness = 0.77
+mesh = SubResource( 4 )
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+angle = 720.0
+angle_random = 1.0
+scale_amount_curve = SubResource( 5 )
+color = Color( 0.898039, 0.803922, 0.772549, 1 )
+color_ramp = SubResource( 6 )
+
+[node name="FlyTextPos" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48017, 0 )
+
+[connection signal="gui_input" from="Top/Viewport/Control/HpBar" to="Top/Viewport/Control/HpBar" method="_on_HealthBar2D_gui_input"]
+[connection signal="gui_input" from="Top/Viewport/Control/SpBar" to="Top/Viewport/Control/SpBar" method="_on_HealthBar2D_gui_input"]

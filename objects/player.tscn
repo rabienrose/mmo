@@ -1,16 +1,21 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://script/player.gd" type="Script" id=1]
 [ext_resource path="res://binary/images/ui/icons8-weapon-30.png" type="Texture" id=2]
 [ext_resource path="res://binary/images/ui/icons8-cursor-32.png" type="Texture" id=3]
+[ext_resource path="res://ui/chara_ui.tscn" type="PackedScene" id=4]
 
 [sub_resource type="CapsuleShape" id=2]
-radius = 0.7
-height = 0.4
+radius = 0.2
+height = 0.1
 
 [sub_resource type="CapsuleMesh" id=1]
+radius = 0.2
+mid_height = 0.1
 
 [sub_resource type="SphereMesh" id=3]
+radius = 0.1
+height = 0.2
 
 [sub_resource type="Animation" id=19]
 resource_name = "Attack"
@@ -61,10 +66,9 @@ nodes/WalkIdle/position = Vector2( 440, 110 )
 nodes/WalkScale/node = SubResource( 16 )
 nodes/WalkScale/position = Vector2( 220, 50 )
 nodes/output/position = Vector2( 850, 140 )
-node_connections = [ "IdleScale", 0, "Idle", "WalkScale", 0, "Walk", "WalkIdle", 0, "WalkScale", "WalkIdle", 1, "IdleScale", "AttackOn", 0, "WalkIdle", "AttackOn", 1, "Animation 3", "output", 0, "AttackOn" ]
+node_connections = [ "output", 0, "AttackOn", "WalkScale", 0, "Walk", "AttackOn", 0, "WalkIdle", "AttackOn", 1, "Animation 3", "IdleScale", 0, "Idle", "WalkIdle", 0, "WalkScale", "WalkIdle", 1, "IdleScale" ]
 
 [node name="Player" type="KinematicBody" groups=["Player"]]
-transform = Transform( 0.358697, 0, 0, 0, 0.457886, 0, 0, 0, 0.358697, 0, 0, 0 )
 collision_layer = 8
 collision_mask = 0
 script = ExtResource( 1 )
@@ -77,7 +81,7 @@ mouse_icon_normal = ExtResource( 3 )
 mouse_icon_atk = ExtResource( 2 )
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
-transform = Transform( 0.585775, 0, 0, 0, -3.02437e-08, 0.691896, 0, -0.585775, -2.5605e-08, 0, 0.637324, 0 )
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.277499, 0 )
 shape = SubResource( 2 )
 
 [node name="CamPlatform" type="Spatial" parent="."]
@@ -94,13 +98,13 @@ collision_mask = 4
 [node name="Spatial" type="Spatial" parent="."]
 
 [node name="Model" type="MeshInstance" parent="Spatial"]
-transform = Transform( -0.362258, 3.16696e-08, 1.38432e-15, 0, -2.1485e-08, 0.491519, 3.16696e-08, 0.362258, 1.58348e-08, 0, 0.751375, 1.14521e-14 )
+transform = Transform( -1, 1.50996e-07, 6.60024e-15, 0, -4.37114e-08, 1, 1.50996e-07, 1, 4.37114e-08, 0, 0.263577, 1.14521e-14 )
 mesh = SubResource( 1 )
 skeleton = NodePath("../../..")
 material/0 = null
 
 [node name="MeshInstance" type="MeshInstance" parent="Spatial/Model"]
-transform = Transform( 0.553322, 0, 0, 0, 0.553322, 0, 0, 0, 0.553322, 0, -0.733709, 0.622358 )
+transform = Transform( 1, 0, -4.23516e-22, 0, 1, 0, 4.23516e-22, 0, 1, 8.8435e-08, -0.14803, 0.0872751 )
 mesh = SubResource( 3 )
 material/0 = null
 
@@ -117,3 +121,5 @@ parameters/AttackOn/active = false
 parameters/IdleScale/scale = 1.0
 parameters/WalkIdle/current = 1
 parameters/WalkScale/scale = 1.0
+
+[node name="UI" parent="." instance=ExtResource( 4 )]
