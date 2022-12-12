@@ -20,36 +20,17 @@ var account=""
 
 var mouse_status="normal"
 
-func get_player_info():
-	var info={}
-	info["hp"]=hp
-	info["sp"]=sp
-	info["lv"]=lv
-	info["exp"]=exp_a
-	info["str"]=str_a
-	info["vit"]=vit
-	info["agi"]=agi
-	info["int"]=int_a
-	info["dex"]=dex
-	info["luk"]=luk
-	info["nickname"]=nickname
-	if is_inside_tree():
-		info["cur_posi"]=Global.v3_2_list(global_transform.origin)
-	else:
-		info["cur_posi"]=[0,0,0]
-	return info
+func add_exp(exp_add):
+	exp_a=exp_a+exp_add
+	print("exp_a: ",exp_a)
 
-func init_player_data():
-	hp=100
-	sp=10
-	lv=1
-	exp_a=1
-	str_a=5
-	vit=5
-	agi=5
-	int_a=5
-	dex=5
-	luk=5
+func on_die(killer):
+	.on_die(killer)
+
+func get_unit_info():
+	var info=.get_unit_info()
+	info["account"]=account
+	return info
 
 remote func on_level_up(new_lv):
 	pass
@@ -60,6 +41,12 @@ remotesync func on_kill_mob():
 func set_master(b_true):
 	b_master=b_true
 	get_node(cam_path).current=b_master
+	if b_true:
+		get_node(char_ui_path).toggle_hpbar(true)
+		get_node(char_ui_path).update_hp_bar(hp, max_hp)
+	else:
+		get_node(char_ui_path).toggle_hpbar(false)
+	get_node(char_ui_path).set_name(account)
 
 func get_point_mob(screen_pos):
 	var from = cam.project_ray_origin(screen_pos)
@@ -93,7 +80,8 @@ func _input(event):
 				Input.set_custom_mouse_cursor(mouse_icon_normal)
 				mouse_status="normal"
 		if pressed:
-			b_drag=true
+			if event.relative.length()>10:
+				b_drag=true
 			cam_platform.rotation.y=cam_platform.rotation.y-event.relative.x*hori_rot_spd
 			if cam_platform.rotation.y>PI:
 				cam_platform.rotation.y=cam_platform.rotation.y-2*PI
@@ -135,6 +123,11 @@ func _ready():
 	state_space=get_world().direct_space_state
 	cam_platform=get_node(cam_platform_path)
 	cam=get_node(cam_path)
-	ai_scheme="idle"
-	set_idle()
-	set_anima_idle()
+	set_ai_scheme("stand",{})
+
+func set_player_attr(info):
+	lv=info["lv"]
+	exp_a=info["exp"]
+
+func on_tar_die():
+	set_ai_scheme("stand",{})

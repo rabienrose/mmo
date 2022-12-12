@@ -6,6 +6,7 @@ export (Resource) var bar_yellow
 
 export (NodePath) var hp_bar_path
 export (NodePath) var sp_bar_path
+export (NodePath) var name_label_path
 
 var hp_bar
 var sp_bar
@@ -27,6 +28,9 @@ func update_hp_bar(amount, full):
 	hp_bar.texture_progress = bar_green
 	if amount < 0.75 * full:
 		hp_bar.texture_progress = bar_yellow
-	if hp_bar.value < 0.45 * full:
+	if amount < 0.45 * full:
 		hp_bar.texture_progress = bar_red
-	hp_bar.value = amount
+	hp_bar.value = amount/float(full)*100
+
+func set_name(name_str):
+	get_node(name_label_path).text=name_str

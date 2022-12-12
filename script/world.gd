@@ -9,6 +9,7 @@ export (NodePath) var login_ui_path
 export (NodePath) var spwan_pos_path
 export (NodePath) var mob_zone_path
 export (NodePath) var navi_inst_path
+export (NodePath) var network_path
 
 var players
 var mobs
@@ -19,18 +20,13 @@ var b_first=true
 func get_player_born_posi():
 	return get_node(spwan_pos_path).global_transform.origin
 
-func get_init_player_info():
-	var player_t = player_res.instance()
-	player_t.init_player_data()
-	var ret = player_t.get_player_info()
-	return ret
-
 func show_login_ui():
 	pass
 
 func update_player_server_data():
 	for player in players.get_children():
-		Global.server_data["user"][player.account]["player_info"]=player.get_player_info()
+		var info=player.get_unit_info()
+		Global.server_data["user"][player.account]["player_info"]=info
 
 func load_server_data():
 	var f=File.new()
@@ -59,16 +55,27 @@ func get_navi_path(from, to):
 	# 	path[i].y=path[i].y-0.2
 	return path
 
-func init_mobs():
-	for i in range(0,1):
-		var mob=mob_res.instance()
-		mob.name="mob_"+str(max_mob_id)
-		max_mob_id=max_mob_id+1
-		get_node(mobs_path).add_child(mob)
-		mob.on_create(self)
-		var r_posi=get_rand_free_spot()
-		mob.set_ground_position(r_posi)
+remotesync func spawn_mob(mob_name, posi, object_name, info):
+	var mob=mob_res.instance()
+	mob.mob_name=mob_name
+	mob.name=object_name
+	get_node(mobs_path).add_child(mob)
+	mob.on_create(self)
+	mob.set_ground_position(posi)
+	mob.init_unit_data()
+	mob.set_hp_by_info(info)
+	return mob
 
+func network_destroy_unit(unit):
+	unit.rpc("destroy_self") 
+
+func create_more_mobs():
+	var mob_name="mob1"
+	for i in range(0,1):
+		var r_posi=get_rand_free_spot()
+		rpc("spawn_mob",mob_name, r_posi,"mob_"+str(max_mob_id),{})
+		max_mob_id=max_mob_id+1
+		
 func _ready():
 	players=get_node(players_path)
 	mobs=get_node(mobs_path)
@@ -80,8 +87,7 @@ func _process(delta):
 		b_first=false
 		map_rid=get_world().navigation_map
 		if Global.is_server:
-			init_mobs()
-
+			create_more_mobs()
 
 func seri_cur_path(path_info):
 	var path_seri=[]
@@ -107,17 +113,27 @@ func get_player_by_name(query_name):
 			return obj
 	return null
 
-remotesync func spawn_mobs(mob_info):
-	pass
+func get_non_master_players_info(master_player_peer_id):
+	var player_list=[]
+	for player in players.get_children():
+		if player.name!=str(master_player_peer_id):
+			var info={}
+			info["account"]=player.account
+			info["peer_id"]=int(player.name)
+			info["cur_posi"]=player.global_transform.origin
+			player_list.append(info)
+	return player_list
 
 func get_mobs_info():
 	var mob_list=[]
 	for mob in mobs.get_children():
 		var mob_info={}
-		mob_info["name"]=mob.name
+		mob_info["mob_name"]=mob.mob_name
 		mob_info["cur_path"]=seri_cur_path(mob.cur_path)
 		mob_info["path_index"]=mob.path_index
 		mob_info["posi"]=mob.global_transform.origin
+		mob_info["object_name"]=mob.name
+		mob_info["hp"]=mob.hp
 		mob_list.append(mob_info)
 	return mob_list
 
@@ -128,23 +144,29 @@ remotesync func spawn_player(player_info):
 	player.name=str(player_info["peer_id"])
 	player.set_network_master(player_info["peer_id"])
 	var peer_id = get_tree().get_network_unique_id()
+	player.set_ground_position(player_info["cur_posi"])
+	if get_tree().is_network_server() or player_info["peer_id"]==peer_id:
+		player.set_base_attr_by_info(player_info)
+		player.set_player_attr(player_info)
+		player.cal_attr()
+		player.set_hp_by_info(player_info)
+	player.account=player_info["account"]
 	if player_info["peer_id"]==peer_id:
 		player.set_master(true)
 	else:
 		player.set_master(false)
-	player.set_ground_position(player_info["cur_posi"])
 
 remote func sync_mob_and_player(mob_player_list):
 	var mob_list=mob_player_list["mobs"]
 	for mob_info in mob_list:
-		var mob=mob_res.instance()
-		mob.name=mob_info["name"]
-		mob.on_create(self)
-		get_node(mobs_path).add_child(mob)
-		mob.start_move(deseri_cur_path(mob_info["cur_path"]),mob_info["path_index"])
-		mob.set_ground_position(Global.list_2_v3(mob_info["posi"]))
+		var new_mob = spawn_mob(mob_info["mob_name"], mob_info["posi"], mob_info["object_name"], mob_info)
+		new_mob.start_move(deseri_cur_path(mob_info["cur_path"]),new_mob.mov_spd,mob_info["path_index"])
+	var player_list=mob_player_list["players"]
+	for player_info in player_list:
+		spawn_player(player_info)
 
-remote func on_user_enter_done():
+remote func on_user_enter_done(player_info):
+	spawn_player(player_info)
 	get_node(login_ui_path).visible=false
-	
+
 

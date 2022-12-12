@@ -5,6 +5,7 @@ export (NodePath) var world_path
 
 var peerid_user_table={}
 var user_peerid_table={}
+var last_server_save_time=0
 
 func _ready():
     if Global.is_server:
@@ -27,11 +28,14 @@ func _player_connected(id):
     print("player connect: ", id)
 
 func _player_disconnected(id):
-    print("player disconnect: ", id)
-    if id in peerid_user_table:
-        var token=peerid_user_table[id]
-        peerid_user_table.erase(id)
-        user_peerid_table.erase(token)
+    if get_tree().is_network_server():
+        print("player disconnect: ", id)
+        if id in peerid_user_table:
+            var player_obj = get_node(world_path).get_player_by_name(str(id))
+            player_obj.rpc("destroy_self")
+            var account=peerid_user_table[id]
+            peerid_user_table.erase(id)
+            user_peerid_table.erase(account)
 
 func _connected_ok():
     if Global.check_token():
@@ -45,28 +49,43 @@ func _server_disconnected():
 func _connected_fail():
     print("_connected_fail")
 
+remote func ask_cliet_exit():
+    print("server sak to exit")
+    get_tree().network_peer.close_connection()
+
+
 remote func on_user_enter(token):
     var user_list=Global.server_data["user"]
     if token in user_list:
         var user_data=user_list[token]
         var sender_id = get_tree().get_rpc_sender_id()
         if token in user_peerid_table:
+            print("already online")
+            rpc_id(sender_id, "ask_cliet_exit")
             return
         peerid_user_table[sender_id]=token
         user_peerid_table[token]=[sender_id]
         var player_info={}
         if not "player_info" in user_data:
-            player_info=get_node(world_path).get_init_player_info()
+            player_info=Global.init_player_attr
             player_info["cur_posi"]=get_node(world_path).get_player_born_posi()
-            player_info["nickname"]=token
+            player_info["account"]=token
         else:
             player_info=user_data["player_info"]
             player_info["cur_posi"]=Global.list_2_v3(player_info["cur_posi"])
         player_info["peer_id"]=sender_id
-        get_node(world_path).rpc("spawn_player",player_info)
-        get_node(world_path).rpc_id(sender_id, "on_user_enter_done")
+        var non_master_info={}
+        non_master_info["peer_id"]=player_info["peer_id"]
+        non_master_info["account"]=player_info["account"]
+        non_master_info["cur_posi"]=player_info["cur_posi"]
+        for user_peer in peerid_user_table:
+            if user_peer!=sender_id:
+                get_node(world_path).rpc_id(user_peer, "spawn_player",non_master_info)
+        get_node(world_path).spawn_player(player_info)
+        get_node(world_path).rpc_id(sender_id, "on_user_enter_done", player_info)
+        var players=get_node(world_path).get_non_master_players_info(sender_id)
         var mobs=get_node(world_path).get_mobs_info()
-        get_node(world_path).rpc_id(sender_id, "sync_mob_and_player",{"mobs":mobs})
+        get_node(world_path).rpc_id(sender_id, "sync_mob_and_player",{"mobs":mobs,"players":players})
 
 remote func login(account, pw):
     var user_list=Global.server_data["user"]
@@ -86,11 +105,28 @@ func update_user_info(account, pw):
         Global.server_data["user"][account]={"pw":pw}
 
 func save_server_data_2_file():
+    get_node(world_path).update_player_server_data()
     var f=File.new()
     f.open(Global.server_data_path, File.WRITE)
     var data_str=JSON.print(Global.server_data)
     f.store_string(data_str)
     f.close()
+    print("server saved")
+
+func check_connected():
+    if get_tree().network_peer.get_connection_status()==NetworkedMultiplayerPeer.CONNECTION_CONNECTED:
+        return true
+    else:
+        return false
+
+func _physics_process(delta):
+    var cur_time=OS.get_ticks_msec()
+    if check_connected() and  get_tree().is_network_server():
+        if last_server_save_time==0:
+            last_server_save_time=cur_time
+        if cur_time-last_server_save_time>Global.server_save_period*1000:
+            last_server_save_time=cur_time
+            save_server_data_2_file()
 
 remote func regist(account, pw):
     var sender_id = get_tree().get_rpc_sender_id()
@@ -98,6 +134,5 @@ remote func regist(account, pw):
         get_node(login_ui_path).rpc_id(sender_id, "regist_result", {"code":"account_exist"})
     else:
         update_user_info(account, pw)
-        get_node(world_path).update_player_server_data()
         save_server_data_2_file()
         get_node(login_ui_path).rpc_id(sender_id, "regist_result", {"code":"ok","data":{"account":account}})

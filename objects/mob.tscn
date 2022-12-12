@@ -201,7 +201,7 @@ nodes/WalkIdle/position = Vector2( 440, 110 )
 nodes/WalkScale/node = SubResource( 16 )
 nodes/WalkScale/position = Vector2( 220, 50 )
 nodes/output/position = Vector2( 850, 140 )
-node_connections = [ "AttackOn", 0, "WalkIdle", "AttackOn", 1, "Animation 3", "IdleScale", 0, "Idle", "WalkIdle", 0, "WalkScale", "WalkIdle", 1, "IdleScale", "WalkScale", 0, "Walk", "output", 0, "AttackOn" ]
+node_connections = [ "output", 0, "AttackOn", "AttackOn", 0, "WalkIdle", "AttackOn", 1, "Animation 3", "IdleScale", 0, "Idle", "WalkIdle", 0, "WalkScale", "WalkIdle", 1, "IdleScale", "WalkScale", 0, "Walk" ]
 
 [node name="Root" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
