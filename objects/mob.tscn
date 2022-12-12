@@ -1,13 +1,14 @@
 [gd_scene load_steps=18 format=2]
 
-[ext_resource path="res://binary/images/tex/mob.png" type="Texture" id=1]
-[ext_resource path="res://script/mob.gd" type="Script" id=2]
+[ext_resource path="res://objects/unit.tscn" type="PackedScene" id=1]
+[ext_resource path="res://binary/images/tex/mob.png" type="Texture" id=2]
+[ext_resource path="res://script/mob.gd" type="Script" id=3]
 
 [sub_resource type="SpatialMaterial" id=1]
 albedo_color = Color( 0.886275, 0.886275, 0.886275, 1 )
-albedo_texture = ExtResource( 1 )
+albedo_texture = ExtResource( 2 )
 
-[sub_resource type="ArrayMesh" id=2]
+[sub_resource type="ArrayMesh" id=19]
 resource_name = "mob_Sphere"
 surfaces/0 = {
 "aabb": AABB( -0.861489, -2.59066e-05, -0.97325, 1.72298, 1.55496, 1.87332 ),
@@ -22,7 +23,7 @@ surfaces/0 = {
 "vertex_count": 691
 }
 
-[sub_resource type="Skin" id=3]
+[sub_resource type="Skin" id=20]
 resource_name = "Skin"
 bind_count = 5
 bind/0/name = "Root"
@@ -41,7 +42,7 @@ bind/4/name = "Ear.R"
 bind/4/bone = -1
 bind/4/pose = Transform( 0.744847, 0.624919, -0.233836, -0.667154, 0.702988, -0.246402, 0.0104021, 0.339536, 0.940536, -0.407007, -1.25289, -0.217888 )
 
-[sub_resource type="Animation" id=4]
+[sub_resource type="Animation" id=21]
 resource_name = "Attack"
 length = 0.833333
 tracks/0/type = "transform"
@@ -80,7 +81,7 @@ tracks/4/imported = false
 tracks/4/enabled = true
 tracks/4/keys = PoolRealArray( 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0.833333, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 )
 
-[sub_resource type="Animation" id=5]
+[sub_resource type="Animation" id=22]
 resource_name = "Ide"
 length = 0.833333
 loop = true
@@ -120,7 +121,7 @@ tracks/4/imported = false
 tracks/4/enabled = true
 tracks/4/keys = PoolRealArray( 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0.833333, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 )
 
-[sub_resource type="Animation" id=6]
+[sub_resource type="Animation" id=23]
 resource_name = "Walk"
 length = 0.833333
 loop = true
@@ -160,9 +161,6 @@ tracks/4/imported = false
 tracks/4/enabled = true
 tracks/4/keys = PoolRealArray( 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0.833333, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 )
 
-[sub_resource type="BoxShape" id=7]
-extents = Vector3( 0.3, 0.3, 0.3 )
-
 [sub_resource type="AnimationNodeAnimation" id=14]
 animation = "Attack"
 
@@ -186,8 +184,8 @@ input_1/auto_advance = false
 
 [sub_resource type="AnimationNodeTimeScale" id=16]
 
-[sub_resource type="AnimationNodeBlendTree" id=11]
-graph_offset = Vector2( 0, -18.0842 )
+[sub_resource type="AnimationNodeBlendTree" id=24]
+graph_offset = Vector2( -125.783, 0.00012207 )
 "nodes/Animation 3/node" = SubResource( 14 )
 "nodes/Animation 3/position" = Vector2( 440, 290 )
 nodes/AttackOn/node = SubResource( 17 )
@@ -203,20 +201,17 @@ nodes/WalkIdle/position = Vector2( 440, 110 )
 nodes/WalkScale/node = SubResource( 16 )
 nodes/WalkScale/position = Vector2( 220, 50 )
 nodes/output/position = Vector2( 850, 140 )
-node_connections = [ "output", 0, "AttackOn", "WalkScale", 0, "Walk", "AttackOn", 0, "WalkIdle", "AttackOn", 1, "Animation 3", "IdleScale", 0, "Idle", "WalkIdle", 0, "WalkScale", "WalkIdle", 1, "IdleScale" ]
+node_connections = [ "AttackOn", 0, "WalkIdle", "AttackOn", 1, "Animation 3", "IdleScale", 0, "Idle", "WalkIdle", 0, "WalkScale", "WalkIdle", 1, "IdleScale", "WalkScale", 0, "Walk", "output", 0, "AttackOn" ]
 
-[node name="Mob" type="KinematicBody" groups=["Mob"]]
-collision_layer = 8
-collision_mask = 0
-script = ExtResource( 2 )
-ground_ray_cast_path = NodePath("RayCast")
-model_path = NodePath("Armature")
-anim_tree_path = NodePath("AnimationTree")
+[node name="Root" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+model_path = NodePath("Model/Armature")
+anim_tree_path = NodePath("Model/AnimationTree")
 
-[node name="Armature" type="Spatial" parent="."]
+[node name="Armature" type="Spatial" parent="Model" index="0"]
 transform = Transform( 0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0, 0 )
 
-[node name="Skeleton" type="Skeleton" parent="Armature"]
+[node name="Skeleton" type="Skeleton" parent="Model/Armature" index="0"]
 bones/0/name = "Root"
 bones/0/parent = -1
 bones/0/rest = Transform( 1, 0, -3.89414e-07, -3.89414e-07, 0, -1, 0, 1, 0, 0, 0, 0 )
@@ -243,28 +238,18 @@ bones/4/rest = Transform( 0.744847, -0.667154, 0.0104019, 0.624919, 0.702988, 0.
 bones/4/enabled = true
 bones/4/bound_children = [  ]
 
-[node name="Sphere" type="MeshInstance" parent="Armature/Skeleton"]
-mesh = SubResource( 2 )
-skin = SubResource( 3 )
-material/0 = null
+[node name="Sphere" type="MeshInstance" parent="Model/Armature/Skeleton" index="0"]
+mesh = SubResource( 19 )
+skin = SubResource( 20 )
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Model" index="1" groups=["Mob"]]
 autoplay = "Ide"
-anims/Attack = SubResource( 4 )
-anims/Ide = SubResource( 5 )
-anims/Walk = SubResource( 6 )
+anims/Attack = SubResource( 21 )
+anims/Ide = SubResource( 22 )
+anims/Walk = SubResource( 23 )
 
-[node name="CollisionShape" type="CollisionShape" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.305289, 0 )
-shape = SubResource( 7 )
-
-[node name="RayCast" type="RayCast" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.572149, 0 )
-cast_to = Vector3( 0, -20, 0 )
-collision_mask = 4
-
-[node name="AnimationTree" type="AnimationTree" parent="."]
-tree_root = SubResource( 11 )
+[node name="AnimationTree" type="AnimationTree" parent="Model" index="2"]
+tree_root = SubResource( 24 )
 anim_player = NodePath("../AnimationPlayer")
 active = true
 parameters/AttackOn/active = false

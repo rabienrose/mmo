@@ -3,9 +3,10 @@ extends BaseChara
 var ai_type="passive"
 
 func on_damaged():
-    print(name," on_damaged")
+	print(name," on_damaged")
 
 func _ready():
-    ai_scheme="rand_walk"
-    set_idle()
-    set_anima_idle()
+	ai_scheme="rand_walk"
+	set_idle()
+	set_anima_idle()
+	get_node(char_ui_path).visible=false

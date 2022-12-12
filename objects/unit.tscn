@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://script/base_chara.gd" type="Script" id=1]
+[ext_resource path="res://ui/chara_ui.tscn" type="PackedScene" id=2]
+
+[sub_resource type="BoxShape" id=7]
+extents = Vector3( 0.3, 0.3, 0.3 )
+
+[node name="Root" type="KinematicBody"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource( 1 )
+char_ui_path = NodePath("UI")
+
+[node name="CollisionShape" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.305289, 0 )
+shape = SubResource( 7 )
+
+[node name="RayCast" type="RayCast" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.572149, 0 )
+cast_to = Vector3( 0, -20, 0 )
+collision_mask = 4
+
+[node name="NavigationAgent" type="NavigationAgent" parent="."]
+
+[node name="Model" type="Spatial" parent="."]
+
+[node name="UI" parent="." instance=ExtResource( 2 )]
