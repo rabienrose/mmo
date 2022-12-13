@@ -10,33 +10,26 @@ var ground_ray_cast
 var world
 var model
 
-var ai_sub_status="stop" # atk mov idle
-var ai_scheme="stand" # stand battle walk rand_walk
+var ai_sub_status="idle" # atk mov idle
+var ai_scheme="stand" # stand battle
 var ai_battle_target=null
 var cur_path=[]
 var path_index=-1 
 
-var max_hp
-var max_sp
+var max_hp=100
 var hp=100
-var sp=10
 var lv=1
-var exp_a=1
-var str_a=5
-var vit=100
-var agi=1
-var int_a=5
-var dex=5
-var luk=5
 var atk_range=1
 var atk_spd=1
-var atk
-var def
-var m_atk
-var m_def
-var flee
-var hit
-var crit
+var min_atk=10
+var max_atk=10
+var add_def=0
+var rate_def=0
+var m_atk=10
+var m_def=0
+var flee=0
+var hit=0
+var crit=0
 var mov_spd=1
 var b_dead=false
 
@@ -46,57 +39,21 @@ var last_ai_time
 var last_path_find_time
 var ai_update_t=200
 var path_update_t=1000
-var randwalk_idle_time=1000
+var last_action_time=0
+
+remotesync func recover_hp(amount):
+	hp=hp+amount
+	if hp>max_hp:
+		hp=max_hp
+	update_hp_bar()
+	if get_tree().is_network_server()==false:
+		pass
 
 func add_exp(exp_add):
 	pass
 
 func on_create(_world):
 	world=_world
-
-func cal_attr():
-	atk=str_a
-	atk_spd=agi
-	max_hp=vit
-
-func get_unit_info():
-	var info={}
-	info["hp"]=hp
-	info["sp"]=sp
-	info["lv"]=lv
-	info["exp"]=exp_a
-	info["str"]=str_a
-	info["vit"]=vit
-	info["agi"]=agi
-	info["int"]=int_a
-	info["dex"]=dex
-	info["luk"]=luk
-	info["mov_spd"]=mov_spd
-	if is_inside_tree():
-		info["cur_posi"]=Global.v3_2_list(global_transform.origin)
-	else:
-		info["cur_posi"]=[0,0,0]
-	return info
-
-func init_unit_data():
-	pass
-
-func set_base_attr_by_info(info):
-	str_a=info["str"]
-	vit=info["vit"]
-	agi=info["agi"]
-	int_a=info["int"]
-	dex=info["dex"]
-	luk=info["luk"]
-	mov_spd=info["mov_spd"]
-
-func set_unit_info(info):
-	set_base_attr_by_info(info)
-	hp=info["hp"]
-	sp=info["sp"]
-	lv=info["lv"]
-	exp_a=info["exp"]
-	cal_attr()
 
 func update_hp_bar():
 	get_node(char_ui_path).update_hp_bar(hp, max_hp)
@@ -128,14 +85,18 @@ remote func request_battle(tar_name):
 		else:
 			print("error: no battle target")
 
+remotesync func set_hp(new_hp):
+	hp=new_hp
+	update_hp_bar()
+	
 remotesync func start_move(path_node,_mov_spd, path_ind=0):
 	path_index=path_ind
 	mov_spd=_mov_spd
 	cur_path=path_node
 	set_anima_walk()
 
-remote func request_move_to(posi):
-	set_ai_scheme("walk",{"mov_posi":posi})
+remotesync func teleport(posi):
+	global_transform.origin=posi
 	
 remote func set_anima_idle():
 	if get_tree().is_network_server()==false:
@@ -152,20 +113,12 @@ remote func trigger_anima_atk():
 remote func trigger_loss_hp(dmg, new_hp):
 	if get_tree().is_network_server()==false:
 		hp=new_hp
-		get_node(char_ui_path).toggle_hpbar(true)
-		update_hp_bar()
 
 func set_ai_scheme(scheme_name, info):
 	if get_tree().is_network_server():
 		ai_scheme = scheme_name
-		if scheme_name=="stop":
+		if scheme_name=="stand":
 			set_ai_sub("idle",{})
-		elif scheme_name=="rand_walk":
-			set_ai_sub("idle",{})
-			last_idle_time=OS.get_ticks_msec()
-		elif scheme_name=="walk":
-			ai_battle_target=null
-			set_ai_sub("mov", info)
 		elif scheme_name=="battle":
 			ai_battle_target=info["battle_tar"]
 			set_ai_sub("mov", {"mov_posi":ai_battle_target.global_transform.origin})
@@ -183,13 +136,7 @@ func set_ai_sub(sub_name, info):
 			pass
 
 func on_move_end():
-	if ai_scheme=="battle":
-		pass
-	elif ai_scheme=="rand_walk":
-		set_ai_sub("idle",{})
-		last_idle_time=OS.get_ticks_msec()
-	elif ai_scheme=="walk":
-		set_ai_sub("idle",{})
+	pass
 
 func on_tar_die():
 	pass
@@ -201,11 +148,41 @@ func check_tar_die():
 		on_tar_die()
 		return true
 
+func get_damage(tar):
+	var chance =Global.rng.randf_range(0,1)
+	var b_crit=false
+	if chance<=crit:
+		b_crit=true
+	var b_miss=false
+	if b_crit==false:
+		if tar.flee-hit>=100:
+			b_miss=true
+		elif hit - tar.flee>=100:
+			b_miss=false
+		else:
+			chance =Global.rng.randf_range(0,1)
+			if chance<(hit - tar.flee)/100.0:
+				b_miss=false
+	if b_miss:
+		return 0
+	var dmg=max_atk
+	if b_crit==false:
+		chance =Global.rng.randf_range(0,1)
+		dmg = (max_atk-min_atk)*chance+min_atk
+		dmg=dmg*(1-tar.rate_def)
+		dmg=dmg-tar.add_def
+	if dmg<0:
+		dmg=0
+	dmg=int(dmg)
+	return dmg
+
 func _physics_process(delta):
+	var cur_time=OS.get_ticks_msec()
 	if cur_path.size()>0:
 		if path_index<cur_path.size():
 			var dir=cur_path[path_index]-global_transform.origin
 			if dir.length()<0.3:
+				last_action_time=cur_time
 				path_index=path_index+1
 			else:
 				var dir_n=dir.normalized()
@@ -215,7 +192,6 @@ func _physics_process(delta):
 		else:
 			cur_path=[]
 			path_index=-1
-	var cur_time=OS.get_ticks_msec()
 	if get_tree().is_network_server() and cur_time-last_ai_time>ai_update_t:
 		if ai_sub_status=="mov":
 			if cur_path.size()==0:
@@ -226,27 +202,26 @@ func _physics_process(delta):
 				if check_tar_die()==false:
 					var dist=(ai_battle_target.global_transform.origin-global_transform.origin).length()
 					if dist<atk_range:
+						last_action_time=cur_time
 						rpc("trigger_anima_atk")
-						ai_battle_target.on_damaged(atk, self)    
+						var dmg=get_damage(ai_battle_target)
+						ai_battle_target.on_damaged(dmg, self)    
 		if ai_scheme=="battle":
 			if check_tar_die()==false:
 				var dist=(ai_battle_target.global_transform.origin-global_transform.origin).length()
 				if dist<atk_range:
 					if ai_sub_status!="atk":
 						set_ai_sub("atk", {"atk_tar":ai_battle_target})
+				elif dist>5:
+					on_target_out()
 				else:
 					if cur_time-last_path_find_time>path_update_t:
 						last_path_find_time=cur_time
 						set_ai_sub("mov", {"mov_posi":ai_battle_target.global_transform.origin})
-		elif ai_scheme=="rand_walk":
-			if ai_sub_status=="idle":
-				if cur_time-last_idle_time>randwalk_idle_time:
-					last_idle_time=cur_time
-					var chance =Global.rng.randf_range(0,1)
-					if chance>0.5:
-						var posi = world.get_rand_free_spot()
-						set_ai_sub("mov", {"mov_posi":posi})
 		last_ai_time=cur_time
+
+func on_target_out():
+	pass
 
 func set_hp_by_info(info):
 	if "hp" in info:

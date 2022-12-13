@@ -1,0 +1,242 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://ui/main_ui.gd" type="Script" id=1]
+[ext_resource path="res://res/font/song25.tres" type="DynamicFont" id=2]
+[ext_resource path="res://res/font/song32.tres" type="DynamicFont" id=3]
+[ext_resource path="res://ui/attr_item.tscn" type="PackedScene" id=4]
+
+[node name="main" type="Node2D"]
+script = ExtResource( 1 )
+name_path = NodePath("Name")
+lv_path = NodePath("LV")
+exp_path = NodePath("EXP")
+hp_path = NodePath("HP")
+menu_path = NodePath("MenuRoot")
+char_root_path = NodePath("CharaRoot")
+attr_item_path = [ NodePath("CharaRoot/HBoxContainer/VBoxContainer/STR"), NodePath("CharaRoot/HBoxContainer/VBoxContainer/VIT"), NodePath("CharaRoot/HBoxContainer/VBoxContainer/AGI"), NodePath("CharaRoot/HBoxContainer/VBoxContainer/DEX"), NodePath("CharaRoot/HBoxContainer/VBoxContainer/INT"), NodePath("CharaRoot/HBoxContainer/VBoxContainer/LUK") ]
+points_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer/Point")
+atk_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/Atk")
+def_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/Def")
+m_atk_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/MAtk")
+m_def_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/MDef")
+aspd_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/ASPD")
+hit_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/Hit")
+flee_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/Flee")
+crit_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/Crit")
+exp_rate_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/ExpRate")
+max_hp_path = NodePath("CharaRoot/HBoxContainer/VBoxContainer2/MaxHp")
+
+[node name="HP" type="Label" parent="."]
+margin_left = 519.0
+margin_top = 26.0
+margin_right = 610.0
+margin_bottom = 63.0
+custom_fonts/font = ExtResource( 2 )
+text = "HP: 100"
+
+[node name="EXP" type="Label" parent="."]
+margin_left = 794.0
+margin_top = 27.0
+margin_right = 886.0
+margin_bottom = 64.0
+custom_fonts/font = ExtResource( 2 )
+text = "EXP: 30"
+
+[node name="Name" type="Label" parent="."]
+margin_left = 199.0
+margin_top = 28.0
+margin_right = 286.0
+margin_bottom = 65.0
+rect_pivot_offset = Vector2( -1367, 398 )
+custom_fonts/font = ExtResource( 2 )
+text = "Chamo"
+
+[node name="LV" type="Label" parent="."]
+margin_left = 397.0
+margin_top = 26.0
+margin_right = 459.0
+margin_bottom = 63.0
+rect_pivot_offset = Vector2( -1367, 398 )
+custom_fonts/font = ExtResource( 2 )
+text = "LV: 2"
+
+[node name="Menu" type="Button" parent="."]
+margin_left = 66.0
+margin_top = 20.0
+margin_right = 150.0
+margin_bottom = 79.0
+custom_fonts/font = ExtResource( 3 )
+text = "菜单"
+
+[node name="MenuRoot" type="VBoxContainer" parent="."]
+visible = false
+margin_left = 66.0
+margin_top = 93.0
+margin_right = 266.0
+margin_bottom = 146.0
+
+[node name="Chara" type="Button" parent="MenuRoot"]
+margin_right = 200.0
+margin_bottom = 53.0
+custom_fonts/font = ExtResource( 3 )
+text = "角色信息"
+
+[node name="CharaRoot" type="Panel" parent="."]
+visible = false
+margin_left = 20.0
+margin_top = 317.0
+margin_right = 520.0
+margin_bottom = 737.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CharaRoot"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 4.0
+margin_bottom = 6.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CharaRoot/HBoxContainer"]
+margin_right = 300.0
+margin_bottom = 426.0
+rect_min_size = Vector2( 300, 0 )
+custom_constants/separation = 10
+
+[node name="STR" parent="CharaRoot/HBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_bottom = 43.0
+
+[node name="VIT" parent="CharaRoot/HBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_top = 53.0
+margin_bottom = 96.0
+
+[node name="AGI" parent="CharaRoot/HBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_top = 106.0
+margin_bottom = 149.0
+
+[node name="DEX" parent="CharaRoot/HBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_top = 159.0
+margin_bottom = 202.0
+
+[node name="INT" parent="CharaRoot/HBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_top = 212.0
+margin_bottom = 255.0
+
+[node name="LUK" parent="CharaRoot/HBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_top = 265.0
+margin_bottom = 308.0
+
+[node name="Point" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer"]
+margin_top = 318.0
+margin_right = 300.0
+margin_bottom = 355.0
+custom_fonts/font = ExtResource( 2 )
+text = "点数：200"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CharaRoot/HBoxContainer/VBoxContainer"]
+margin_top = 365.0
+margin_right = 300.0
+margin_bottom = 408.0
+custom_constants/separation = 10
+
+[node name="Clear" type="Button" parent="CharaRoot/HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_right = 145.0
+margin_bottom = 43.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "重置"
+
+[node name="OK" type="Button" parent="CharaRoot/HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_left = 155.0
+margin_right = 300.0
+margin_bottom = 43.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "确定"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CharaRoot/HBoxContainer"]
+margin_left = 304.0
+margin_right = 504.0
+margin_bottom = 426.0
+rect_min_size = Vector2( 200, 0 )
+
+[node name="Atk" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_right = 200.0
+margin_bottom = 37.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "攻击：2-30"
+
+[node name="Def" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_top = 41.0
+margin_right = 200.0
+margin_bottom = 78.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "防御：30+20%"
+
+[node name="MDef" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_top = 82.0
+margin_right = 200.0
+margin_bottom = 119.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "魔法防御：20%"
+
+[node name="MAtk" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_top = 123.0
+margin_right = 200.0
+margin_bottom = 160.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "魔法攻击：100"
+
+[node name="Flee" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_top = 164.0
+margin_right = 200.0
+margin_bottom = 201.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "回避：20"
+
+[node name="Hit" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_top = 205.0
+margin_right = 200.0
+margin_bottom = 242.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "命中：25"
+
+[node name="ASPD" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_top = 246.0
+margin_right = 200.0
+margin_bottom = 283.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "攻速：1/s"
+
+[node name="Crit" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_top = 287.0
+margin_right = 200.0
+margin_bottom = 324.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "暴击率：2%"
+
+[node name="MaxHp" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_top = 328.0
+margin_right = 200.0
+margin_bottom = 365.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "HP：200"
+
+[node name="ExpRate" type="Label" parent="CharaRoot/HBoxContainer/VBoxContainer2"]
+margin_top = 369.0
+margin_right = 200.0
+margin_bottom = 406.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 2 )
+text = "经验倍率：1.2∂"
+
+[connection signal="button_down" from="Menu" to="." method="_on_Menu_button_down"]
+[connection signal="button_up" from="MenuRoot/Chara" to="." method="_on_Chara_button_up"]
+[connection signal="button_up" from="CharaRoot/HBoxContainer/VBoxContainer/HBoxContainer/Clear" to="." method="_on_Clear_button_up"]
+[connection signal="button_up" from="CharaRoot/HBoxContainer/VBoxContainer/HBoxContainer/OK" to="." method="_on_OK_button_up"]

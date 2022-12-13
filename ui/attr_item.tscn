@@ -1,0 +1,70 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://ui/attr_item.gd" type="Script" id=1]
+[ext_resource path="res://res/font/song25.tres" type="DynamicFont" id=2]
+
+[node name="HBoxContainer" type="HBoxContainer"]
+margin_right = 300.0
+margin_bottom = 40.0
+script = ExtResource( 1 )
+name_path = NodePath("Name")
+val1_path = NodePath("Val1")
+val2_path = NodePath("Val2")
+
+[node name="Name" type="Label" parent="."]
+margin_top = 3.0
+margin_right = 60.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 60, 0 )
+custom_fonts/font = ExtResource( 2 )
+text = "STR"
+align = 1
+
+[node name="Dec" type="Button" parent="."]
+margin_left = 64.0
+margin_right = 104.0
+margin_bottom = 43.0
+rect_min_size = Vector2( 40, 0 )
+custom_fonts/font = ExtResource( 2 )
+text = "-"
+
+[node name="Val1" type="Label" parent="."]
+margin_left = 108.0
+margin_top = 3.0
+margin_right = 148.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 40, 0 )
+custom_fonts/font = ExtResource( 2 )
+text = "20"
+align = 1
+
+[node name="S" type="Label" parent="."]
+margin_left = 152.0
+margin_top = 3.0
+margin_right = 212.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 60, 0 )
+custom_fonts/font = ExtResource( 2 )
+text = "+"
+align = 1
+
+[node name="Val2" type="Label" parent="."]
+margin_left = 216.0
+margin_top = 3.0
+margin_right = 256.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 40, 0 )
+custom_fonts/font = ExtResource( 2 )
+text = "0"
+align = 1
+
+[node name="Inc" type="Button" parent="."]
+margin_left = 260.0
+margin_right = 300.0
+margin_bottom = 43.0
+rect_min_size = Vector2( 40, 0 )
+custom_fonts/font = ExtResource( 2 )
+text = "+"
+
+[connection signal="button_down" from="Dec" to="." method="_on_Dec_button_down"]
+[connection signal="button_down" from="Inc" to="." method="_on_Inc_button_down"]

@@ -1,3 +1,6 @@
-mob_name,str,vit,agi,int,dex,luk,mov_spd,mob_exp
-mob1,5,100,1,1,1,1,0.5,20
-mob2,5,200,1,1,1,2,0.5,50
+mob_name,lv,min_atk,max_atk,max_hp,flee,hit,atk_range,atk_spd,mov_spd,crit,add_def,rate_def,m_atk,m_def,mob_exp,atk_type,spwan_area,num,walk_range,res_name
+mob1,1,1,10,50,10,10,1,0.5,1,0,0,0,0,0,30,passive,mob1,5,5,mob1
+mob2,1,10,100,200,20,40,1,0.5,1,0,0,0,0,0,80,active,mob2,5,5,mob2
+mob3,1,30,200,50,30,30,1,0.5,1,0.5,20,0,0,0,300,passive,mob3,5,5,mob3
+mob4,1,20,30,150,40,20,1,0.5,1,0.8,0,0,0,0,200,assist,mob4,5,5,mob4
+mob5,1,30,40,300,50,20,1,1,1,0,50,0,0,0,400,active,mob5,5,5,mob5

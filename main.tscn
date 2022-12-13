@@ -2,8 +2,8 @@
 
 [ext_resource path="res://script/network.gd" type="Script" id=1]
 [ext_resource path="res://binary/images/tex/ground_tex.png" type="Texture" id=2]
+[ext_resource path="res://ui/main_ui.tscn" type="PackedScene" id=3]
 [ext_resource path="res://objects/big_balltree.tscn" type="PackedScene" id=6]
-[ext_resource path="res://objects/mob.tscn" type="PackedScene" id=7]
 [ext_resource path="res://objects/player.tscn" type="PackedScene" id=8]
 [ext_resource path="res://script/world.gd" type="Script" id=9]
 [ext_resource path="res://ui/login.tscn" type="PackedScene" id=10]
@@ -55,13 +55,14 @@ data = PoolVector3Array( 13.125, 0.9913, -13.125, 15, 1.0254, -15, 15, 1.0225, -
 [node name="Root" type="Spatial"]
 script = ExtResource( 9 )
 player_res = ExtResource( 8 )
-mob_res = ExtResource( 7 )
 players_path = NodePath("Players")
 mobs_path = NodePath("Mobs")
 login_ui_path = NodePath("Login")
-spwan_pos_path = NodePath("StaticWorld/SpwanPos")
-mob_zone_path = NodePath("StaticWorld/MobZones/1")
+spwan_pos_path = NodePath("StaticWorld/PlayerSpwan")
+mob_zone_path = NodePath("StaticWorld/MobZones")
 navi_inst_path = NodePath("NavigationMeshInstance")
+network_path = NodePath("Network")
+ui_main_path = NodePath("MainUI")
 
 [node name="Network" type="Node" parent="."]
 script = ExtResource( 1 )
@@ -125,15 +126,25 @@ shadow_color = Color( 0.0431373, 0, 0.407843, 1 )
 shadow_bias = 1.0
 omni_range = 6.982
 
-[node name="Navigation" type="Navigation" parent="StaticWorld"]
-
-[node name="SpwanPos" type="Position3D" parent="StaticWorld"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.52082, 0.7491, 9.41355 )
-
 [node name="MobZones" type="Spatial" parent="StaticWorld"]
 
-[node name="1" type="Position3D" parent="StaticWorld/MobZones"]
+[node name="mob1" type="Position3D" parent="StaticWorld/MobZones"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.73917, 0.919867, 10.5198 )
+
+[node name="mob2" type="Position3D" parent="StaticWorld/MobZones"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.26819, 0.919867, 1.26358 )
+
+[node name="mob3" type="Position3D" parent="StaticWorld/MobZones"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.144831, 0.919867, 2.53677 )
+
+[node name="mob4" type="Position3D" parent="StaticWorld/MobZones"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5.95775, 0.919867, 8.07832 )
+
+[node name="mob5" type="Position3D" parent="StaticWorld/MobZones"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 7.57023, 0.919867, -7.20177 )
+
+[node name="PlayerSpwan" type="Position3D" parent="StaticWorld"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.52082, 0.7491, 9.41355 )
 
 [node name="UIRoot" type="Control" parent="."]
 margin_right = 40.0
@@ -166,3 +177,6 @@ shape = SubResource( 6 )
 
 [node name="Tree2" parent="NavigationMeshInstance/Trees" instance=ExtResource( 6 )]
 transform = Transform( 1.30951, 0, -1.1231, 0, 1.72516, 0, 1.1231, 0, 1.30951, -9.44292, 0.482788, 6.72515 )
+
+[node name="MainUI" parent="." instance=ExtResource( 3 )]
+world_path = NodePath("..")
